@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>AVI Video Editor</title>
+    <link href="https://vjs.zencdn.net/7.10.2/video-js.min.css" rel="stylesheet">
+    <style>
+        body { font-family: Arial, sans-serif; }
+        .video-js { width: 352px; height: 288px; }
+        .controls { margin-top: 10px; }
+    </style>
+</head>
+<body>
+    <input type="file" id="fileInput" accept=".avi" />
+    <video id="myVideo" class="video-js vjs-default-skin" controls>
+        <source id="videoSource" type="video/avi">
+        Your browser does not support the video tag.
+    </video>
+    <div class="controls">
+        <button id="zoomIn">Zoom In</button>
+        <button id="zoomOut">Zoom Out</button>
+        <input type="range" id="playbackRate" min="0.5" max="2" step="0.1" value="1">
+        <button id="saveChanges">Save Changes</button>
+        <button id="downloadVideo">Download Video</button>
+    </div>
+
+    <script src="https://vjs.zencdn.net/7.10.2/video.min.js"></script>
+    <script>
+    document.getElementById('fileInput').addEventListener('change', function(e) {
+        let file = e.target.files[0];
+        if (file) {
+            let blobURL = URL.createObjectURL(file);
+            document.getElementById('videoSource').src = blobURL;
+            videojs('myVideo').load();
+        }
+    });
+
+    let video = videojs('myVideo');
+    
+    document.getElementById('zoomIn').addEventListener('click', function() {
+        let currentScale = video.zoom() || 1;
+        video.zoom(currentScale * 1.1);
+    });
+
+    document.getElementById('zoomOut').addEventListener('click', function() {
+        let currentScale = video.zoom() || 1;
+        video.zoom(currentScale * 0.9);
+    });
+
+    document.getElementById('playbackRate').addEventListener('input', function(e) {
+        video.playbackRate(e.target.value);
+    });
+
+    // Placeholder for server-side operations
+    document.getElementById('saveChanges').addEventListener('click', function() {
+        // Here you would typically send the video or changes to the server
+        alert('Changes would be saved server-side.');
+    });
+
+    document.getElementById('downloadVideo').addEventListener('click', function() {
+        // Server would process this request to download the edited video
+        alert('Download would start with edited video.');
+    });
+
+    // Custom zoom function for video.js
+    videojs.registerPlugin('zoom', function() {
+        let scale = 1;
+        this.on('play', () => {
+            this.el().style.transform = `scale(${scale})`;
+        });
+        return {
+            zoom: function(s) {
+                if (s) scale = s;
+                return scale;
+            }
+        };
+    });
+    </script>
+</body>
+</html>
